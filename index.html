@@ -178,12 +178,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
+      padding: 0 10px;
     }
 
     .now-playing-artist {
       font-size: 1.1rem;
       color: #c9b896;
       margin-bottom: 30px;
+      min-height: 28px;
     }
 
     .player-controls {
@@ -567,7 +570,7 @@
         </div>
 
         <div class="player-title">🎵 Tocando Agora</div>
-        <div class="now-playing" id="nowPlaying">Sintonizando...</div>
+        <div class="now-playing" id="nowPlaying">Carregando...</div>
         <div class="now-playing-artist" id="nowArtist">Aguardando metadados</div>
 
         <div class="visualizer" id="visualizer">
@@ -699,7 +702,7 @@
 
   <script>
     const STREAM_URL = 'https://stream.estacaosertanejamontesclaros.shop/sertaneja';
-    // ✅ Usando o seu Worker do Cloudflare que já funciona
+    // ✅ Endereço do seu Worker que já funciona
     const API_URL = 'https://metadados-radio-estacao-sertaneja.marcosheangels.workers.dev';
     
     const audio = document.getElementById('radioStream');
@@ -745,28 +748,34 @@
 
     audio.volume = 0.8;
 
-    // ✅ Função corrigida para buscar dados do seu Worker
+    // ✅ Função corrigida para buscar os dados
     async function fetchMetadata() {
       try {
         const response = await fetch(API_URL, {
+          method: 'GET',
           cache: 'no-cache',
-          headers: { 'Accept': 'application/json' }
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
         });
 
-        if (!response.ok) throw new Error(`Erro: ${response.status}`);
+        if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
 
-        const data = await response.json();
+        const dados = await response.json();
 
-        if (data.ok) {
-          nowArtist.textContent = data.artista;
-          nowPlaying.textContent = data.musica;
-          listenersCount.textContent = data.ouvintes_atual;
+        if (dados.ok === true) {
+          // Atualiza os campos na tela
+          nowArtist.textContent = dados.artista;
+          nowPlaying.textContent = dados.musica;
+          listenersCount.textContent = dados.ouvintes_atual;
         } else {
-          throw new Error(data.erro || 'Sem dados');
+          throw new Error(dados.erro || 'Sem dados recebidos');
         }
 
-      } catch (error) {
-        console.log('Erro ao buscar metadados:', error.message);
+      } catch (erro) {
+        console.log('Erro ao buscar metadados:', erro.message);
+        // Mantém o texto padrão se der erro
         if (!isPlaying) {
           nowPlaying.textContent = 'Sertanejo Raiz 24h';
           nowArtist.textContent = 'Estação Sertaneja Moc';
@@ -775,8 +784,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🎻 Estação Sertaneja - Sistema Iniciado');
+      console.log('🎻 Sistema iniciado, buscando metadados...');
       
+      // Busca a primeira vez e repete a cada 15 segundos
       fetchMetadata();
       setInterval(fetchMetadata, 15000);
 
