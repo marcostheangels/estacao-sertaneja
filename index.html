@@ -234,7 +234,7 @@
         </div>
     </footer>
 
-    <audio id="audioPlayer" src="https://estacaosertanejamontesclaros.shop/radio" preload="none"></audio>
+    <audio id="audioPlayer" src="https://stream.estacaosertanejamontesclaros.shop/sertaneja" preload="none"></audio>
 
     <script>
         const audio = document.getElementById('audioPlayer');
@@ -272,9 +272,8 @@
                     });
             } else {
                 audio.pause();
-                // Limpa buffer do Icecast
                 audio.src = ""; 
-                audio.src = "https://estacaosertanejamontesclaros.shop/radio";
+                audio.src = "https://stream.estacaosertanejamontesclaros.shop/sertaneja";
                 
                 isPlaying = false;
                 playIcon.className = "fa-solid fa-play text-sm";
