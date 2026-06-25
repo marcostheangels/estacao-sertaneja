@@ -688,7 +688,8 @@
 
   <script>
     const STREAM_URL = 'https://stream.estacaosertanejamontesclaros.shop/sertaneja';
-    const API_URL = 'https://metadados-radio-estacao-sertaneja.marcosheangels.workers.dev';
+    // ✅ Endereço correto do seu Worker
+    const API_URL = 'https://metadados-radio.marcostheangels.workers.dev/';
     
     const audio = document.getElementById('radioStream');
     const playBtn = document.getElementById('playBtn');
@@ -738,8 +739,7 @@
         const resposta = await fetch(`${API_URL}?t=${Date.now()}`, {
           method: 'GET',
           mode: 'cors',
-          cache: 'no-store',
-          redirect: 'follow'
+          cache: 'no-store'
         });
 
         if (!resposta.ok) throw new Error(`Erro: ${resposta.status}`);
@@ -765,6 +765,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log('✅ Sistema iniciado, buscando informações...');
+      
       fetchMetadata();
       setInterval(fetchMetadata, 12000);
 
