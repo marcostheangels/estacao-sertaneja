@@ -517,20 +517,6 @@
         gap: 20px;
       }
     }
-
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(212, 168, 67, 0.3);
-      border-top-color: #d4a843;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
@@ -702,7 +688,7 @@
 
   <script>
     const STREAM_URL = 'https://stream.estacaosertanejamontesclaros.shop/sertaneja';
-    // ✅ Endereço do seu Worker que já funciona
+    // Endereço do seu Worker que já funciona
     const API_URL = 'https://metadados-radio-estacao-sertaneja.marcosheangels.workers.dev';
     
     const audio = document.getElementById('radioStream');
@@ -748,34 +734,35 @@
 
     audio.volume = 0.8;
 
-    // ✅ Função corrigida para buscar os dados
+    // Função de busca com tratamento completo
     async function fetchMetadata() {
       try {
-        const response = await fetch(API_URL, {
+        // Adiciona parâmetro aleatório para evitar cache do navegador
+        const resposta = await fetch(`${API_URL}?t=${Date.now()}`, {
           method: 'GET',
-          cache: 'no-cache',
+          cache: 'no-store',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
         });
 
-        if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
+        if (!resposta.ok) throw new Error(`Erro: ${resposta.status}`);
 
-        const dados = await response.json();
+        const dados = await resposta.json();
 
         if (dados.ok === true) {
-          // Atualiza os campos na tela
+          // Atualiza os dados na tela
           nowArtist.textContent = dados.artista;
           nowPlaying.textContent = dados.musica;
           listenersCount.textContent = dados.ouvintes_atual;
         } else {
-          throw new Error(dados.erro || 'Sem dados recebidos');
+          throw new Error(dados.erro || 'Resposta inválida');
         }
 
       } catch (erro) {
         console.log('Erro ao buscar metadados:', erro.message);
-        // Mantém o texto padrão se der erro
+        // Mostra texto padrão se der erro
         if (!isPlaying) {
           nowPlaying.textContent = 'Sertanejo Raiz 24h';
           nowArtist.textContent = 'Estação Sertaneja Moc';
@@ -784,20 +771,16 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🎻 Sistema iniciado, buscando metadados...');
+      console.log('✅ Sistema iniciado, buscando informações...');
       
-      // Busca a primeira vez e repete a cada 15 segundos
+      // Busca imediatamente e repete a cada 12 segundos
       fetchMetadata();
-      setInterval(fetchMetadata, 15000);
+      setInterval(fetchMetadata, 12000);
 
       audio.addEventListener('play', () => setPlayingState(true));
       audio.addEventListener('pause', () => setPlayingState(false));
       audio.addEventListener('error', (e) => {
-        console.error('Erro no stream:', e);
-        if (isPlaying) {
-          nowPlaying.textContent = 'Erro na conexão';
-          nowArtist.textContent = 'Tente novamente';
-        }
+        console.error('Erro no áudio:', e);
       });
     });
 
