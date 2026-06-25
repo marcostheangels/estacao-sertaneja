@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Estação Sertaneja Montes Claros - A sua rádio profissional de sertanejo raiz e modão 24 horas ao vivo.">
+    <meta name="keywords" content="sertanejo, sertanejo raiz, modão, rádio profissional, Montes Claros, MOC, ao vivo, stream">
+    <meta name="author" content="Estação Sertaneja Network">
+    
+    <meta property="og:title" content="Estação Sertaneja Montes Claros | Transmissão Digital 24h">
+    <meta property="og:description" content="Sinal digital de alta definição. O melhor do sertanejo de raiz no norte de Minas Gerais.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://estacaosertanejamontesclaros.shop">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=600&auto=format&fit=crop">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Estação Sertaneja Montes Claros | Transmissão Digital 24h">
+    <meta name="twitter:description" content="Sinal digital de alta definição. O melhor do sertanejo de raiz no norte de Minas Gerais.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=600&auto=format&fit=crop">
+    <meta name="theme-color" content="#06b6d4">
+    <link rel="icon" type="image/jpeg" href="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=600&auto=format&fit=crop">
+    
+    <title>Estação Sertaneja Montes Claros | Rede Digital de Comunicação</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, runTransaction, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCn9EYNFB094gysRRuGvnffOAbHTobFsbo",
+            authDomain: "forro-stream-moc.firebaseapp.com",
+            databaseURL: "https://forro-stream-moc-default-rtdb.firebaseio.com",
+            projectId: "forro-stream-moc",
+            storageBucket: "forro-stream-moc.firebasestorage.app",
+            messagingSenderId: "156075369710",
+            appId: "1:156075369710:web:7314e4407fb55cd4d17fff"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        window.firebaseDB = {
+            database,
+            counterRef: ref(database, 'forro_stream/total_listeners'),
+            lastUpdateRef: ref(database, 'forro_stream/last_update'),
+            onValue, runTransaction, set, ref
+        };
+        
+        console.log('✅ Firebase conectado com sucesso à rede global.');
+    </script>
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        .eq-bar { animation: eq 1s ease-in-out infinite; transform-origin: bottom; }
+        @keyframes eq { 
+            0%, 100% { transform: scaleY(0.1); } 
+            50% { transform: scaleY(1); } 
+        }
+
+        .studio-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
+
+    <header class="bg-slate-950/80 backdrop-blur-md border-b border-slate-900 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-800 shadow-inner flex-shrink-0">
+                    <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=150&auto=format&fit=crop" alt="Estação Sertaneja Logo" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-black text-lg tracking-wider text-white uppercase">Estação Sertaneja</h1>
+                        <span class="bg-cyan-500/10 text-cyan-400 font-extrabold text-[9px] px-1.5 py-0.5 rounded uppercase tracking-widest border border-cyan-500/20">HD Digital</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase block mt-0.5">Montes Claros / MG</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest uppercase text-slate-400">
+                <a href="#live-player" class="hover:text-cyan-400 text-cyan-400 transition-colors flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span> No Ar</a>
+                <a href="#programming-grid" class="hover:text-cyan-400 transition-colors">Programação</a>
+                <a href="#footer-corporate" class="hover:text-cyan-400 transition-colors">Institucional</a>
+            </nav>
+
+            <button onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-cyan-400 text-xl transition-colors">
+                <i id="menuIcon" class="fa-solid fa-bars-staggered"></i>
+            </button>
+        </div>
+    </header>
+
+    <div id="mobileMenu" class="fixed inset-x-0 top-[73px] bottom-0 bg-slate-950/98 backdrop-blur-xl z-40 hidden flex-col items-center justify-center gap-10">
+        <nav class="flex flex-col items-center gap-8 text-sm font-bold tracking-widest uppercase">
+            <a href="#live-player" onclick="toggleMobileMenu()" class="text-cyan-400">Ao Vivo</a>
+            <a href="#programming-grid" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-cyan-400">Programação</a>
+            <a href="#footer-corporate" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-cyan-400">Institucional</a>
+        </nav>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 md:py-16 flex-grow w-full z-10 relative grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <div id="live-player" class="lg:col-span-2 space-y-6">
+            <div class="studio-card p-6 md:p-10 rounded-2xl shadow-2xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    
+                    <div class="w-full max-w-[240px] aspect-square rounded-xl overflow-hidden shadow-2xl relative group bg-slate-950 border border-slate-800">
+                        <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=600&auto=format&fit=crop" alt="Estúdio de Transmissão Pro" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                    </div>
+
+                    <div class="flex-grow w-full flex flex-col justify-between self-stretch py-1">
+                        <div class="text-center md:text-left space-y-2.5">
+                            <div class="inline-flex items-center gap-2 bg-slate-950/60 border border-slate-800/80 px-3 py-1 rounded-full text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400" id="statusIndicator"></span>
+                                <span id="statusText">Estúdio Pronto</span>
+                            </div>
+                            <h2 class="text-3xl font-black tracking-tight text-white md:text-4xl">Estação Sertaneja</h2>
+                            <p class="text-slate-400 text-sm font-medium">Rede de transmissão integrada • Sertanejo de Raiz & Modão</p>
+                        </div>
+
+                        <div class="my-5 bg-slate-950/60 border border-slate-900/80 px-4 py-3 rounded-xl flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 tracking-widest uppercase">Streaming Core (Icecast)</span>
+                            <div id="waveform" class="flex items-end gap-[4px] h-5 opacity-20 transition-all duration-500">
+                                <div class="w-[3px] h-full bg-cyan-500 eq-bar" style="animation-delay: 0.1s"></div>
+                                <div class="w-[3px] h-3/4 bg-blue-500 eq-bar" style="animation-delay: 0.4s"></div>
+                                <div class="w-[3px] h-5/6 bg-cyan-400 eq-bar" style="animation-delay: 0.2s"></div>
+                                <div class="w-[3px] h-2/3 bg-blue-600 eq-bar" style="animation-delay: 0.6s"></div>
+                                <div class="w-[3px] h-full bg-cyan-500 eq-bar" style="animation-delay: 0.3s"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <button id="playBtn" onclick="toggleAudio()" class="w-full sm:w-auto px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/10 transform active:scale-[0.99] transition-all text-xs tracking-widest uppercase">
+                                <i id="playIcon" class="fa-solid fa-play text-sm"></i>
+                                <span id="playText">Conectar Sinal</span>
+                            </button>
+                            
+                            <div class="w-full sm:w-auto flex items-center justify-between gap-4 bg-slate-950/50 border border-slate-900 px-4 py-3.5 rounded-xl flex-grow max-w-xs">
+                                <button onclick="toggleMute()" class="text-slate-400 hover:text-white transition-colors">
+                                    <i id="muteIcon" class="fa-solid fa-volume-high text-xs"></i>
+                                </button>
+                                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/30 border border-slate-900 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4 min-w-0 w-full sm:w-auto">
+                    <div class="w-11 h-11 rounded-lg bg-cyan-500/5 flex items-center justify-center border border-cyan-500/10 text-cyan-400 flex-shrink-0">
+                        <i class="fa-solid fa-compact-disc text-base animate-spin" style="animation-duration: 4s;"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest block">No Ar Agora</span>
+                        <h3 id="nowPlayingTitle" class="text-sm font-bold text-slate-200 truncate">Sintonizando metadados...</h3>
+                        <p id="nowPlayingArtist" class="text-xs text-slate-400 truncate">Rede Estação Sertaneja</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-950/80 border border-slate-850 px-3.5 py-2 rounded-lg text-xs font-bold text-slate-400 self-stretch sm:self-auto justify-center">
+                    <i class="fa-solid fa-satellite-dish text-cyan-400"></i>
+                    <span id="listenerCount" class="text-white font-black">0</span> ouvintes digitais
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="studio-card p-5 rounded-xl">
+                <h3 class="text-xs font-black tracking-widest text-white uppercase mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-headset text-cyan-400"></i> Central do Ouvinte
+                </h3>
+                <div class="flex flex-col gap-2.5">
+                    <a href="https://wa.me/5538999999999" target="_blank" class="flex items-center justify-between p-3 bg-slate-950/40 border border-slate-900 hover:border-cyan-500/30 rounded-lg text-slate-300 hover:text-white transition-all text-xs font-semibold group">
+                        <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-500 text-sm"></i> Linha Direta Studio</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="flex items-center justify-between p-3 bg-slate-950/40 border border-slate-900 hover:border-cyan-500/30 rounded-lg text-slate-300 hover:text-white transition-all text-xs font-semibold group">
+                        <span class="flex items-center gap-2"><i class="fa-brands fa-instagram text-pink-500 text-sm"></i> @estacaosertanejamoc</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div id="programming-grid" class="studio-card p-5 rounded-xl">
+                <h3 class="text-xs font-black tracking-widest text-white uppercase mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-timeline text-cyan-400"></i> Grade de Programação
+                </h3>
+                <div class="space-y-2">
+                    <div class="p-3 rounded-lg bg-slate-950/40 border border-l-2 border-slate-900 border-l-cyan-500 flex justify-between items-center">
+                        <div class="min-w-0 pr-2">
+                            <h4 class="text-xs font-bold text-slate-200 truncate">Caminhos da Roça</h4>
+                            <p class="text-[11px] text-slate-500 truncate">O amanhecer com os grandes modões</p>
+                        </div>
+                        <span class="text-[10px] font-black text-cyan-400 bg-cyan-500/5 px-2 py-1 rounded border border-cyan-500/10">05h - 08h</span>
+                    </div>
+                    <div class="p-3 rounded-lg bg-slate-950/20 border border-l-2 border-slate-900 border-l-slate-800 flex justify-between items-center">
+                        <div class="min-w-0 pr-2">
+                            <h4 class="text-xs font-bold text-slate-400 truncate">Arena de Ouro</h4>
+                            <p class="text-[11px] text-slate-500 truncate">Clássicos absolutos de Tião Carreiro a Milionário</p>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded">08h - 12h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer id="footer-corporate" class="bg-slate-950 border-t border-slate-900 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-500 font-medium">
+            <p>&copy; 2026 Estação Sertaneja Montes Claros. Todos os direitos reservados. Sistema de Alta Fidelidade Digital.</p>
+            <p class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Servidores Online e Operacionais</p>
+        </div>
+    </footer>
+
+    <audio id="audioPlayer" src="https://estacaosertanejamontesclaros.shop/radio" preload="none"></audio>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const playText = document.getElementById('playText');
+        const statusText = document.getElementById('statusText');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const waveform = document.getElementById('waveform');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const muteIcon = document.getElementById('muteIcon');
+
+        let isPlaying = false;
+        let lastVolume = 0.8;
+
+        function toggleAudio() {
+            if (!isPlaying) {
+                statusText.innerText = "Conectando ao gateway...";
+                statusIndicator.className = "w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse";
+                
+                audio.play()
+                    .then(() => {
+                        isPlaying = true;
+                        playIcon.className = "fa-solid fa-pause text-sm";
+                        playText.innerText = "Desconectar";
+                        statusText.innerText = "Sinal HD Conectado";
+                        statusIndicator.className = "w-1.5 h-1.5 rounded-full bg-cyan-400";
+                        waveform.style.opacity = "1";
+                        incrementListenerCount();
+                    })
+                    .catch(err => {
+                        console.error("Erro crítico no player core:", err);
+                        statusText.innerText = "Erro na rede. Reconectando...";
+                        statusIndicator.className = "w-1.5 h-1.5 rounded-full bg-red-500";
+                    });
+            } else {
+                audio.pause();
+                // Limpa buffer do Icecast
+                audio.src = ""; 
+                audio.src = "https://estacaosertanejamontesclaros.shop/radio";
+                
+                isPlaying = false;
+                playIcon.className = "fa-solid fa-play text-sm";
+                playText.innerText = "Conectar Sinal";
+                statusText.innerText = "Estúdio Pronto";
+                statusIndicator.className = "w-1.5 h-1.5 rounded-full bg-cyan-400";
+                waveform.style.opacity = "0.2";
+            }
+        }
+
+        function setVolume(val) {
+            audio.volume = val;
+            lastVolume = val;
+            if(val == 0) {
+                muteIcon.className = "fa-solid fa-volume-xmark text-xs";
+            } else if (val < 0.5) {
+                muteIcon.className = "fa-solid fa-volume-low text-xs";
+            } else {
+                muteIcon.className = "fa-solid fa-volume-high text-xs";
+            }
+        }
+
+        function toggleMute() {
+            if(audio.volume > 0) {
+                volumeSlider.value = 0;
+                setVolume(0);
+            } else {
+                volumeSlider.value = lastVolume || 0.8;
+                setVolume(lastVolume || 0.8);
+            }
+        }
+
+        function incrementListenerCount() {
+            if(window.firebaseDB) {
+                const { runTransaction, counterRef, lastUpdateRef, set } = window.firebaseDB;
+                runTransaction(counterRef, (currentValue) => {
+                    return (currentValue || 0) + 1;
+                });
+                set(lastUpdateRef, Date.now());
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const checkFirebase = setInterval(() => {
+                if (window.firebaseDB) {
+                    clearInterval(checkFirebase);
+                    const { onValue, counterRef } = window.firebaseDB;
+                    onValue(counterRef, (snapshot) => {
+                        const count = snapshot.val() || 0;
+                        document.getElementById('listenerCount').innerText = count;
+                    });
+                    
+                    fetchMetadata();
+                    setInterval(fetchMetadata, 15000);
+                }
+            }, 500);
+        });
+
+        const musicasMock = [
+            {titulo: "Chico Mineiro", artista: "Tonico & Tinoco"},
+            {titulo: "O Ipê e o Prisioneiro", artista: "Liu & Léu"},
+            {titulo: "Boate Azul", artista: "Tião Carreiro & Pardinho"},
+            {titulo: "Fio de Cabelo", artista: "Chitãozinho & Xororó"},
+            {titulo: "Telefone Mudo", artista: "Trio Parada Dura"}
+        ];
+
+        function fetchMetadata() {
+            const randomSong = musicasMock[Math.floor(Math.random() * musicasMock.length)];
+            document.getElementById('nowPlayingTitle').innerText = randomSong.titulo;
+            document.getElementById('nowPlayingArtist').innerText = randomSong.artista;
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
+            if(menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+                icon.className = "fa-solid fa-xmark";
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+                icon.className = "fa-solid fa-bars-staggered";
+            }
+        }
+    </script>
+</body>
+</html>
