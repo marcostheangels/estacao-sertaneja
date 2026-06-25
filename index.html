@@ -688,7 +688,6 @@
 
   <script>
     const STREAM_URL = 'https://stream.estacaosertanejamontesclaros.shop/sertaneja';
-    // Endereço do seu Worker que já funciona
     const API_URL = 'https://metadados-radio-estacao-sertaneja.marcosheangels.workers.dev';
     
     const audio = document.getElementById('radioStream');
@@ -734,17 +733,13 @@
 
     audio.volume = 0.8;
 
-    // Função de busca com tratamento completo
     async function fetchMetadata() {
       try {
-        // Adiciona parâmetro aleatório para evitar cache do navegador
         const resposta = await fetch(`${API_URL}?t=${Date.now()}`, {
           method: 'GET',
+          mode: 'cors',
           cache: 'no-store',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
+          redirect: 'follow'
         });
 
         if (!resposta.ok) throw new Error(`Erro: ${resposta.status}`);
@@ -752,17 +747,15 @@
         const dados = await resposta.json();
 
         if (dados.ok === true) {
-          // Atualiza os dados na tela
           nowArtist.textContent = dados.artista;
           nowPlaying.textContent = dados.musica;
           listenersCount.textContent = dados.ouvintes_atual;
         } else {
-          throw new Error(dados.erro || 'Resposta inválida');
+          throw new Error(dados.erro || 'Sem dados');
         }
 
       } catch (erro) {
         console.log('Erro ao buscar metadados:', erro.message);
-        // Mostra texto padrão se der erro
         if (!isPlaying) {
           nowPlaying.textContent = 'Sertanejo Raiz 24h';
           nowArtist.textContent = 'Estação Sertaneja Moc';
@@ -772,16 +765,11 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log('✅ Sistema iniciado, buscando informações...');
-      
-      // Busca imediatamente e repete a cada 12 segundos
       fetchMetadata();
       setInterval(fetchMetadata, 12000);
 
       audio.addEventListener('play', () => setPlayingState(true));
       audio.addEventListener('pause', () => setPlayingState(false));
-      audio.addEventListener('error', (e) => {
-        console.error('Erro no áudio:', e);
-      });
     });
 
     document.addEventListener('keydown', (e) => {
