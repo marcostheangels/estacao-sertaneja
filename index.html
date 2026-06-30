@@ -213,7 +213,6 @@
     .listeners-empty-forr{ padding:26px 18px;text-align:center;color:rgba(203,213,225,.5); font-style:italic;font-size:.88rem; }
     .listeners-status-forr{margin-top:9px;font-size:.7rem;text-align:center;color:rgba(203,213,225,.4);font-style:italic}
 
-    /* 🆕 BLOCO ESPECIAL: TOTAL DE VISITAS + ONLINE */
     .visit-summary{ max-width:600px;margin:18px auto 0;padding:20px;border-radius:20px; background:linear-gradient(135deg, rgba(99,102,241,.10), rgba(168,85,247,.08), rgba(34,197,94,.10)); border:1px solid rgba(99,102,241,.4); backdrop-filter:blur(8px); }
     .visit-summary-title{ display:flex;align-items:center;justify-content:center;gap:8px; font-size:.95rem;color:#a5b4fc;text-transform:uppercase;letter-spacing:1.5px;font-weight:800;margin-bottom:16px; }
     .visit-summary-grid{ display:grid;grid-template-columns:1fr 1fr;gap:14px; }
@@ -380,7 +379,6 @@
           </div>
         </div>
 
-        <!-- 🆕 BLOCO ESPECIAL: ONLINE + VISITAS (DESTACADO) -->
         <div class="visit-summary" id="visitSummary">
           <div class="visit-summary-title">
             📊 ESTATÍSTICAS DO SITE
@@ -541,9 +539,6 @@
     const listenersListRef = database.ref('listeners');
     const ICECAST_PROXY_URL = 'https://wandering-hall-0361.marcostheangels.workers.dev/';
 
-    // ============================================
-    // 🌍 DETECTAR LOCALIZAÇÃO
-    // ============================================
     async function detectarLocalizacao() {
         try {
             const apis = [
@@ -552,7 +547,6 @@
                 { name: 'ip-api.com', url: 'https://ip-api.com/json/?fields=status,country,countryCode,region,regionName,city,org,query',
                   parse: (d) => ({ city: d.city, state: d.regionName, country: d.country, countryCode: d.countryCode, isp: d.org, ip: d.query }) }
             ];
-
             for (const api of apis) {
                 try {
                     const controller = new AbortController();
@@ -563,7 +557,7 @@
                     const data = await response.json();
                     const info = api.parse(data);
                     if (info.city && info.city !== '—') {
-                        log('✅ IP detectado:', info);
+                        log('✅ IP:', info);
                         const lc = document.getElementById('locationCityF');
                         const ls = document.getElementById('locationStateF');
                         const lf = document.getElementById('locationFlagF');
@@ -585,7 +579,7 @@
             const lst = document.getElementById('locationStatusF');
             if (lst) lst.innerHTML = '⚠️ Não detectado';
             return null;
-        } catch (err) { log('❌ Erro localização:', err); return null; }
+        } catch (err) { log('❌ Erro:', err); return null; }
     }
 
     function getCountryFlag(countryCode) {
@@ -593,9 +587,6 @@
         return String.fromCodePoint(...countryCode.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0)));
     }
 
-    // ============================================
-    // 🎵 RÁDIO PLAYER
-    // ============================================
     const FONTES = [
       'https://stream.estacaosertanejamontesclaros.shop/sertaneja',
       'https://stream.estacaosertanejamontesclaros.shop:8000/sertaneja',
@@ -633,6 +624,8 @@
         tocando.textContent="🎵 Sertanejo Raiz 24h";
         artista.textContent="Estação Sertaneja Moc";
         buscarMeta();
+        // 🆕 INCREMENTA VISITA A CADA PLAY (não só uma vez por sessão)
+        incrementTotalVisits();
       }catch(e){
         estado(false); idx++; tent++;
         if(tent <= FONTES.length){
@@ -674,9 +667,6 @@
     }
     setInterval(buscarMeta,12000);
 
-    // ============================================
-    // 🆕 SISTEMA DE OUINTES - COM OS 2 CARDS
-    // ============================================
     const myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     let myUserRef = null;
     let heartbeatInterval = null;
@@ -712,8 +702,7 @@
                 country: locationData.country || 'BR', isp: locationData.isp || '',
                 location: locationText, lastSeen: firebase.database.ServerValue.TIMESTAMP
             });
-            log('✅ SALVO:', myUserId);
-        } catch (err) { log('❌ ERRO:', err); }
+        } catch (err) {}
     }
 
     function startHeartbeat() {
@@ -743,12 +732,9 @@
             if (radioEl) radioEl.textContent = radioOnly;
             if (onlineEl) onlineEl.textContent = totalOnline;
             if (visitsEl) visitsEl.textContent = totalAccumulated.toLocaleString('pt-BR');
-            
-            log(`📊 Site:${siteOnly} | Radio:${radioOnly} | Total Online:${totalOnline} | Visitas Acumuladas:${totalAccumulated}`);
-        } catch (err) { log('❌ update:', err); }
+        } catch (err) {}
     }
 
-    // CONTADOR DO SITE
     listenersListRef.on('value', (snapshot) => {
         try {
             const data = snapshot.val() || {};
@@ -761,7 +747,7 @@
             siteOnlineCount = count;
             updateDisplays();
             displayIPsList(snapshot);
-        } catch (err) { log('❌ Firebase:', err); }
+        } catch (err) {}
     });
 
     function displayIPsList(snapshot) {
@@ -811,10 +797,9 @@
                     list.appendChild(row);
                 });
             }
-        } catch (err) { log('❌ displayIPsList:', err); }
+        } catch (err) {}
     }
 
-    // BUSCA OUVINTES DO ICECAST
     async function fetchRadioOnline() {
         try {
             const response = await fetch(ICECAST_PROXY_URL, { cache: 'no-cache' });
@@ -823,23 +808,22 @@
                 icecastListeners = data.listeners || 0;
                 updateDisplays();
             }
-        } catch (err) { log('❌ Worker:', err); }
+        } catch (err) {}
     }
     setInterval(fetchRadioOnline, 2000);
     fetchRadioOnline();
 
-    // CONTADOR ACUMULADO DE VISITAS
-    let countedThisSession = sessionStorage.getItem('esm_visit_counted');
+    // ============================================
+    // 🆕 CONTADOR DE VISITAS - INCREMENTA EM CADA PLAY
+    // ============================================
     function incrementTotalVisits() {
-        if (countedThisSession) return;
-        countedThisSession = '1';
-        sessionStorage.setItem('esm_visit_counted', '1');
+        // 🆕 SEM sessionStorage - conta toda vez que dá Play
         counterRef.transaction((current) => {
             if (current === null || current.count === undefined) return { count: 1, last_updated: Date.now() };
             return { count: current.count + 1, last_updated: Date.now() };
         }).then(r => {
             totalAccumulated = r.snapshot.val().count;
-            log(`👁️ Total de visitas (acumulado): ${totalAccumulated}`);
+            log(`👁️ Visita registrada. Total: ${totalAccumulated}`);
             updateDisplays();
         }).catch(err => log('Erro:', err));
     }
@@ -851,9 +835,6 @@
         }
     });
 
-    // ============================================
-    // 🚀 INICIALIZAÇÃO
-    // ============================================
     function init() {
         try {
             detectarLocalizacao().then(locationData => {
@@ -862,8 +843,9 @@
                     startHeartbeat();
                 }
             });
+            // 🆕 TAMBÉM conta 1 vez ao carregar o site
             incrementTotalVisits();
-        } catch (err) { log('❌ Init:', err); }
+        } catch (err) {}
     }
 
     if (document.readyState === 'loading') {
@@ -881,7 +863,7 @@
             setInterval(updateClock, 1000);
             fetchNowPlaying();
             setInterval(fetchNowPlaying, 2000);
-        } catch (err) { log('❌ Load:', err); }
+        } catch (err) {}
     });
 
     function updateClock() {
