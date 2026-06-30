@@ -154,10 +154,6 @@
       box-shadow:0 0 12px rgba(230,195,106,.7);
     }
 
-    .estatisticas{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin-top:20px;padding-top:16px;border-top:1px solid var(--borda)}
-    .estatisticas div{color:var(--texto2);font-size:.9rem}
-    .estatisticas strong{color:var(--ouro);font-size:1.25rem;font-weight:900;display:block;font-family:'Orbitron',sans-serif}
-
     .aviso-erro{display:none;margin-top:14px;padding:10px 14px;border-radius:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#fecaca;font-size:.82rem}
     .aviso-erro.visivel{display:block}
     .btn-tentar{background:transparent;border:1px solid var(--ouro);color:var(--ouro);padding:4px 10px;border-radius:999px;cursor:pointer;margin-left:8px}
@@ -196,6 +192,22 @@
     .location-detail-value.ip{font-family:'Orbitron',monospace;color:var(--ouro)}
     .location-status{margin-top:12px;font-size:.78rem;text-align:center;color:rgba(248,241,224,.6);font-style:italic}
     .location-status.listening{color:#22c55e;font-weight:800;font-style:normal}
+
+    /* 🆕 DOIS CARDS: SITE e RADIOSNET (IGUAL AO FORRÓ) */
+    .stats-grid{ display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px auto 0;max-width:620px; }
+    .stats-card{ padding:18px;border-radius:18px; text-align:center;backdrop-filter:blur(8px); position:relative;overflow:hidden; }
+    .stats-card.site-card{ background:linear-gradient(135deg,rgba(34,197,94,.10),rgba(34,197,94,.05)); border:1px solid rgba(34,197,94,.4); }
+    .stats-card.radio-card{ background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(168,85,247,.05)); border:1px solid rgba(168,85,247,.4); }
+    .stats-card .header{ display:flex;align-items:center;justify-content:center;gap:6px; font-size:.78rem;text-transform:uppercase;letter-spacing:1.3px;font-weight:800;margin-bottom:8px; }
+    .stats-card.site-card .header{ color:#86efac; }
+    .stats-card.radio-card .header{ color:#d8b4fe; }
+    .stats-card .value{ font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;line-height:1;margin:4px 0; }
+    .stats-card.site-card .value{ color:#86efac;text-shadow:0 0 8px rgba(34,197,94,.3); }
+    .stats-card.radio-card .value{ color:#d8b4fe;text-shadow:0 0 8px rgba(168,85,247,.3); }
+    .stats-card .icon{ font-size:1.3rem; }
+    .stats-card .footer{ font-size:.65rem;color:rgba(255,255,255,.4);margin-top:6px; }
+    .stats-card .live-indicator{ display:inline-block;width:6px;height:6px;background:#22c55e;border-radius:50%; margin-right:4px;animation:pulseVivo 1.2s infinite; }
+    .stats-card.radio-card .live-indicator{ background:#a855f7; }
 
     /* ============== CARD DE OUINTES COM IPs ============== */
     .listeners-card{
@@ -258,6 +270,7 @@
       .location-details{grid-template-columns:1fr}
       .listeners-table-header, .listener-row{grid-template-columns:1fr 1fr 60px;font-size:.72rem}
       .listeners-table-header .col-state, .listener-row .state-cell{display:none}
+      .stats-grid{grid-template-columns:1fr;gap:10px}
     }
 
     .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:50px 0}
@@ -352,11 +365,6 @@
             <span id="volTxt">80%</span>
           </div>
 
-          <div class="estatisticas">
-            <div>👥 Ouvintes agora<br><strong id="ouvintes">—</strong></div>
-            <div>👁️ Total de visitas<br><strong id="totalVisitas">0</strong></div>
-          </div>
-
           <div class="aviso-erro" id="erroBox">⚠️ <span id="erroTxt">Não foi possível conectar</span><button class="btn-tentar" id="btnTentar">Tentar novamente</button></div>
         </div>
 
@@ -388,17 +396,41 @@
           </div>
         </div>
 
+        <!-- 🆕 DOIS CARDS: SITE e RADIOSNET -->
+        <div class="stats-grid">
+          <div class="stats-card site-card">
+            <div class="header">
+              <span class="live-indicator"></span>
+              <span><i class="fa-solid fa-globe icon"></i> NO SITE</span>
+            </div>
+            <div class="value" id="statSiteCount">0</div>
+            <div class="footer">
+              <i class="fa-solid fa-play" style="color:#22c55e"></i> Quem deu Play aqui
+            </div>
+          </div>
+          <div class="stats-card radio-card">
+            <div class="header">
+              <span class="live-indicator"></span>
+              <span><i class="fa-solid fa-satellite-dish icon"></i> NO RADIOSNET</span>
+            </div>
+            <div class="value" id="statRadioCount">0</div>
+            <div class="footer">
+              <i class="fa-solid fa-signal" style="color:#a855f7"></i> Ouvindo via Icecast
+            </div>
+          </div>
+        </div>
+
         <!-- ============== CARD DE OUINTES COM IPs ============== -->
         <div class="listeners-card" id="listenersCard">
           <div class="listeners-header">
             <div class="listeners-title">
               <span>🔐</span>
-              <span>Ouvintes com IP Real</span>
+              <span>IPs de quem deu Play no Site</span>
             </div>
             <div class="listeners-total">
               <span class="live-dot"></span>
               <span class="num" id="listenersCount">0</span>
-              <span>ao vivo</span>
+              <span>ativos</span>
             </div>
           </div>
           <div class="listeners-table">
@@ -409,11 +441,11 @@
               <div style="text-align:right">Visto</div>
             </div>
             <div class="listeners-table-body" id="listenersList">
-              <div class="listeners-empty">🔐 Aguardando alguém clicar em Play...</div>
+              <div class="listeners-empty">🔐 Aguardando alguém dar Play no site...</div>
             </div>
           </div>
           <div class="listeners-status" id="listenersStatus">
-            🟢 IPs reais capturados • Limpeza automática em 24h
+            🟢 IPs em tempo real • Limpeza após 24h sem atividade
           </div>
         </div>
 
@@ -465,8 +497,10 @@
     <source src="https://stream.estacaosertanejamontesclaros.shop/sertaneja" type="audio/mpeg">
   </audio>
 
+  <!-- 🔥 FIREBASE + WORKER COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://kit.fontawesome.com/2c8e8e8e8e.js" crossorigin="anonymous"></script>
 
   <script>
     const DEBUG_MODE = true;
@@ -474,7 +508,7 @@
 
     // ============================================
     // 🔥 CONFIGURAÇÃO FIREBASE - RÁDIO ESTAÇÃO SERTANEJA
-    // 👉 TROQUE OS DADOS ABAIXO PELOS DO SEU NOVO PROJETO
+    // 👉 USA O MESMO PROJETO "radio-conexao-contador" PARA COMPARTILHAR DADOS
     // ============================================
     const firebaseConfig = {
         apiKey: "AIzaSyDp5fRdPQbfn2XUmFpaArXoeE4n1-KnKA0",
@@ -488,12 +522,71 @@
 
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const visitasRef = database.ref('radio/totalVisitas');
-    const ouvintesRef = database.ref('radio/ouvintesAgora');
+    const counterRef = database.ref('forro_stream/total_listeners');
     const listenersListRef = database.ref('listeners');
+    
+    // 🆕 URL do Worker Cloudflare - SUBSTITUA PELA SUA!
+    // Crie um worker em https://dash.cloudflare.com/ seguindo o tutorial que te passei
+    // O Worker conta os ouvintes do seu Icecast (stream.estacaosertanejamontesclaros.shop)
+    const ICECAST_PROXY_URL = 'https://flat-rain-59ad.marcostheangels.workers.dev/';
 
     // ============================================
-    // 🎵 RÁDIO (código original mantido)
+    // 🌍 DETECTAR LOCALIZAÇÃO
+    // ============================================
+    async function detectarLocalizacao() {
+        const locationCard = document.getElementById('locationCard');
+        const locationCity = document.getElementById('locationCity');
+        const locationState = document.getElementById('locationState');
+        const locationFlag = document.getElementById('locationFlag');
+        const locationIP = document.getElementById('locationIP');
+        const locationISP = document.getElementById('locationISP');
+        const locationStatus = document.getElementById('locationStatus');
+
+        const apis = [
+            { name: 'ipapi.co', url: 'https://ipapi.co/json/',
+              parse: (d) => ({ city: d.city, state: d.region, country: d.country_name, countryCode: d.country_code, isp: d.org, ip: d.ip }) },
+            { name: 'ip-api.com', url: 'https://ip-api.com/json/?fields=status,country,countryCode,region,regionName,city,org,query',
+              parse: (d) => ({ city: d.city, state: d.regionName, country: d.country, countryCode: d.countryCode, isp: d.org, ip: d.query }) }
+        ];
+
+        for (const api of apis) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(api.url, { signal: controller.signal, cache: 'no-cache' });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                const info = api.parse(data);
+                if (info.city && info.city !== '—') {
+                    log('✅ Detectado:', info);
+                    locationCity.textContent = info.city;
+                    locationState.textContent = `${info.state || ''} • ${info.country || ''}`.trim();
+                    locationFlag.textContent = getCountryFlag(info.countryCode);
+                    locationIP.textContent = info.ip || '—';
+                    locationISP.textContent = info.isp || '—';
+                    locationCard.classList.remove('loading');
+                    locationStatus.innerHTML = `✅ Detectado`;
+                    return info;
+                }
+            } catch (err) { log(`❌ ${api.name} falhou:`, err.message); }
+        }
+
+        locationCity.textContent = 'Não detectado';
+        locationState.textContent = 'Desative AdBlock';
+        locationFlag.textContent = '❓';
+        locationIP.textContent = '—';
+        locationCard.classList.remove('loading');
+        return null;
+    }
+
+    function getCountryFlag(countryCode) {
+        if (!countryCode || countryCode.length !== 2) return '🌍';
+        return String.fromCodePoint(...countryCode.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0)));
+    }
+
+    // ============================================
+    // 🎵 RÁDIO PLAYER (mantido 100% do original)
     // ============================================
     const FONTES = [
       'https://stream.estacaosertanejamontesclaros.shop/sertaneja',
@@ -503,9 +596,8 @@
     const API = 'https://metadados-radio.marcostheangels.workers.dev/';
     const $ = id => document.getElementById(id);
     const audio = $('radio'), btn=$('btnPlay'), viz=$('viz'), player=$('player');
-    const tocando=$('tocando'), artista=$('artista'), ouvintes=$('ouvintes');
+    const tocando=$('tocando'), artista=$('artista');
     const erroBox=$('erroBox'), erroTxt=$('erroTxt'), vol=$('vol'), volTxt=$('volTxt');
-    const totalVisitasEl = $('totalVisitas');
 
     let estaTocando=false, tent=0, idx=0;
     $('ano').textContent = new Date().getFullYear();
@@ -513,27 +605,6 @@
     const vs = localStorage.getItem('vol_esm');
     if(vs){audio.volume=vs/100;vol.value=vs;volTxt.textContent=vs+'%'}
     vol.oninput = e=>{audio.volume=e.target.value/100;volTxt.textContent=e.target.value+'%';localStorage.setItem('vol_esm',e.target.value)};
-
-    // ============== SISTEMA DE VISITAS ==============
-    const CHAVE_VISITAS = 'esm_total_visitas';
-    const CHAVE_CONTROLE = 'esm_ja_contou';
-    const MS_DIA = 24 * 60 * 60 * 1000;
-    let totalVisitas = parseInt(localStorage.getItem(CHAVE_VISITAS)) || 0;
-
-    function formatarNum(n){ return n.toLocaleString('pt-BR') }
-    function atualizaTela(){ totalVisitasEl.textContent = formatarNum(totalVisitas) }
-
-    function contarVisita(){
-      const agora = Date.now();
-      const ultima = parseInt(localStorage.getItem(CHAVE_CONTROLE)) || 0;
-      if(agora - ultima > MS_DIA){
-        totalVisitas++;
-        localStorage.setItem(CHAVE_VISITAS, totalVisitas);
-        localStorage.setItem(CHAVE_CONTROLE, agora);
-      }
-      atualizaTela();
-    }
-    contarVisita();
 
     function estado(s){
       estaTocando=s;
@@ -553,12 +624,6 @@
         estado(true); tent=0;
         tocando.textContent="🎵 Sertanejo Raiz 24h";
         artista.textContent="Estação Sertaneja Moc";
-
-        totalVisitas++;
-        localStorage.setItem(CHAVE_VISITAS, totalVisitas);
-        localStorage.setItem(CHAVE_CONTROLE, Date.now());
-        atualizaTela();
-
         buscarMeta();
       }catch(e){
         estado(false); idx++; tent++;
@@ -596,83 +661,21 @@
         if(d && d.ok){
           tocando.textContent = d.musica || tocando.textContent;
           artista.textContent  = d.artista || artista.textContent;
-          ouvintes.textContent = typeof d.ouvintes_atual!=='undefined' ? d.ouvintes_atual : '—';
         }
       }catch(e){}
     }
     setInterval(buscarMeta,12000);
 
     // ============================================
-    // 🌍 DETECTAR LOCALIZAÇÃO + IP
-    // ============================================
-    async function detectarLocalizacao() {
-        const locationCard = document.getElementById('locationCard');
-        const locationCity = document.getElementById('locationCity');
-        const locationState = document.getElementById('locationState');
-        const locationFlag = document.getElementById('locationFlag');
-        const locationIP = document.getElementById('locationIP');
-        const locationISP = document.getElementById('locationISP');
-        const locationStatus = document.getElementById('locationStatus');
-
-        const apis = [
-            {
-                name: 'ipapi.co',
-                url: 'https://ipapi.co/json/',
-                parse: (d) => ({ city: d.city, state: d.region, country: d.country_name, countryCode: d.country_code, isp: d.org, ip: d.ip })
-            },
-            {
-                name: 'ip-api.com',
-                url: 'https://ip-api.com/json/?fields=status,country,countryCode,region,regionName,city,org,query',
-                parse: (d) => ({ city: d.city, state: d.regionName, country: d.country, countryCode: d.countryCode, isp: d.org, ip: d.query })
-            }
-        ];
-
-        for (const api of apis) {
-            try {
-                log(`🔄 Tentando ${api.name}...`);
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-                const response = await fetch(api.url, { signal: controller.signal, cache: 'no-cache' });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                const info = api.parse(data);
-                if (info.city && info.city !== '—') {
-                    log('✅ Detectado:', info);
-                    locationCity.textContent = info.city;
-                    locationState.textContent = `${info.state || ''} • ${info.country || ''}`.trim();
-                    locationFlag.textContent = getCountryFlag(info.countryCode);
-                    locationIP.textContent = info.ip || '—';
-                    locationISP.textContent = info.isp || '—';
-                    locationCard.classList.remove('loading');
-                    locationStatus.innerHTML = `✅ Detectado`;
-                    return info;
-                }
-            } catch (err) {
-                log(`❌ ${api.name} falhou:`, err.message);
-            }
-        }
-
-        locationCity.textContent = 'Não detectado';
-        locationState.textContent = 'Desative AdBlock';
-        locationFlag.textContent = '❓';
-        locationIP.textContent = '—';
-        locationCard.classList.remove('loading');
-        return null;
-    }
-
-    function getCountryFlag(countryCode) {
-        if (!countryCode || countryCode.length !== 2) return '🌍';
-        const codePoints = countryCode.toUpperCase().split('').map(char => 127397 + char.charCodeAt(0));
-        return String.fromCodePoint(...codePoints);
-    }
-
-    // ============================================
-    // 🌍 SISTEMA DE OUINTES COM IP
+    // 🆕 SISTEMA DE OUINTES - LÓGICA IGUAL AO FORRÓ
     // ============================================
     const myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     let myUserRef = null;
     let heartbeatInterval = null;
+    let myLocationData = null;
+    let totalAccumulated = 0;
+    let icecastListeners = 0;
+    let siteOnlineCount = 0;
 
     function timeAgo(timestamp) {
         const diff = Date.now() - timestamp;
@@ -684,43 +687,37 @@
         return `${Math.floor(hours / 24)}d`;
     }
 
-    async function registerMyPresence(locationData) {
-        if (!locationData || !locationData.ip) {
-            log('❌ Sem dados de localização para registrar');
-            return;
+    async function updateLastSeen() {
+        if (myUserRef) {
+            try { await myUserRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP }); } catch (err) {}
         }
+    }
+
+    async function registerMyPresence(locationData) {
+        if (!locationData || !locationData.ip) return;
         
         myUserRef = listenersListRef.child(myUserId);
+        myLocationData = locationData;
         const locationText = locationData.state ? `${locationData.city}, ${locationData.state}` : locationData.city;
         
-        const dataToSave = {
-            ip: locationData.ip,
-            city: locationData.city,
-            state: locationData.state || '',
-            country: locationData.country || 'BR',
-            isp: locationData.isp || '',
-            location: locationText,
-            lastSeen: firebase.database.ServerValue.TIMESTAMP
-        };
-        
-        log('💾 Salvando no Firebase:', dataToSave);
-        
         try {
-            await myUserRef.set(dataToSave);
-            log('✅ SALVO COM SUCESSO! UserId:', myUserId);
-        } catch (err) {
-            log('❌ ERRO AO SALVAR:', err);
-        }
+            await myUserRef.set({
+                ip: locationData.ip,
+                city: locationData.city,
+                state: locationData.state || '',
+                country: locationData.country || 'BR',
+                isp: locationData.isp || '',
+                location: locationText,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+            log('✅ SALVO:', myUserId);
+        } catch (err) { log('❌ ERRO:', err); }
     }
 
     function startHeartbeat() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        heartbeatInterval = setInterval(() => {
-            if (myUserRef) {
-                myUserRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP })
-                    .catch(err => log('❌ Heartbeat erro:', err));
-            }
-        }, 30000);
+        heartbeatInterval = setInterval(updateLastSeen, 15000);
+        updateLastSeen();
     }
 
     function removeMyPresence() {
@@ -728,85 +725,154 @@
         if (heartbeatInterval) clearInterval(heartbeatInterval);
     }
 
-    function displayListeners(snapshot) {
-      const list = document.getElementById('listenersList');
-      const countEl = document.getElementById('listenersCount');
-      
-      if (!list || !countEl) return;
-      
-      const data = snapshot.val() || {};
-      log('📋 Listeners recebidos:', Object.keys(data).length);
-      
-      const now = Date.now();
-      const TIME_LIMIT = 24 * 60 * 60 * 1000;
-      const activeListeners = [];
-      const cleanupPromises = [];
-
-      Object.entries(data).forEach(([id, listener]) => {
-        const lastSeen = listener.lastSeen || 0;
-        if (now - lastSeen < TIME_LIMIT && listener.ip) {
-          activeListeners.push({ id, ...listener });
-        } else if (lastSeen > 0) {
-          cleanupPromises.push(listenersListRef.child(id).remove());
-        }
-      });
-
-      activeListeners.sort((a, b) => {
-        if (a.id === myUserId) return -1;
-        if (b.id === myUserId) return 1;
-        return (b.lastSeen || 0) - (a.lastSeen || 0);
-      });
-
-      countEl.textContent = activeListeners.length;
-      list.innerHTML = '';
-
-      if (activeListeners.length === 0) {
-        list.innerHTML = '<div class="listeners-empty">🔐 Ninguém clicou em Play ainda...</div>';
-      } else {
-        activeListeners.forEach(listener => {
-          const row = document.createElement('div');
-          row.className = 'listener-row';
-          if (listener.id === myUserId) row.classList.add('me');
-          row.innerHTML = `
-            <div class="ip-cell">${listener.ip || '—'}${listener.id === myUserId ? ' (VOCÊ)' : ''}</div>
-            <div class="state-cell">${listener.city || '—'}</div>
-            <div class="city-cell">${listener.state || 'BR'}</div>
-            <div class="time-cell">${timeAgo(listener.lastSeen)}</div>
-          `;
-          list.appendChild(row);
-        });
-      }
-
-      Promise.all(cleanupPromises).catch(() => {});
+    // 🆕 FUNÇÃO INTELIGENTE - Separa Site e RadiosNet
+    function updateAllDisplays() {
+        const siteOnly = siteOnlineCount;
+        const icecastTotal = icecastListeners;
+        const radioOnly = Math.max(0, icecastTotal - siteOnly);
+        const totalOnline = Math.max(icecastTotal, siteOnly);
+        
+        document.getElementById('statSiteCount').textContent = siteOnly;
+        document.getElementById('statRadioCount').textContent = radioOnly;
+        document.getElementById('floatingCount') && (document.getElementById('floatingCount').textContent = totalOnline);
+        document.getElementById('totalOnlineDisplay') && (document.getElementById('totalOnlineDisplay').textContent = totalOnline);
+        document.getElementById('listenerCount') && (document.getElementById('listenerCount').textContent = totalOnline);
+        document.getElementById('totalVisitsAccumulated') && (document.getElementById('totalVisitsAccumulated').textContent = totalAccumulated.toLocaleString('pt-BR'));
     }
 
-    function setupListenersRealtime() {
-        log('🔌 Conectando ao Firebase...');
-        listenersListRef.on('value', (snapshot) => {
-            log('✅ Dados recebidos em tempo real');
-            displayListeners(snapshot);
-        }, (err) => {
-            log('❌ ERRO DE CONEXÃO Firebase:', err);
-            log('⚠️ Verifique as regras do Realtime Database');
-            const list = document.getElementById('listenersList');
-            if (list) {
-                list.innerHTML = '<div class="listeners-empty">⚠️ Erro: Verifique as regras do Firebase</div>';
+    // CONTADOR DO SITE: pessoas que deram play (lastSeen < 5 min)
+    listenersListRef.on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        const now = Date.now();
+        const ACTIVE_LIMIT = 5 * 60 * 1000;
+        let count = 0;
+        Object.values(data).forEach(listener => {
+            if (now - (listener.lastSeen || 0) < ACTIVE_LIMIT && listener.ip) count++;
+        });
+        siteOnlineCount = count;
+        updateAllDisplays();
+        displayIPsList(snapshot);
+    });
+
+    function displayIPsList(snapshot) {
+        const list = document.getElementById('listenersList');
+        const countEl = document.getElementById('listenersCount');
+        if (!list || !countEl) return;
+        
+        const data = snapshot.val() || {};
+        const now = Date.now();
+        const ACTIVE_LIMIT = 5 * 60 * 1000;
+        const activeListeners = [];
+        const cleanupPromises = [];
+
+        Object.entries(data).forEach(([id, listener]) => {
+            const lastSeen = listener.lastSeen || 0;
+            if (now - lastSeen < ACTIVE_LIMIT && listener.ip) {
+                activeListeners.push({ id, ...listener });
+            } else if (now - lastSeen > 24 * 60 * 60 * 1000) {
+                cleanupPromises.push(listenersListRef.child(id).remove().catch(() => {}));
             }
         });
+
+        activeListeners.sort((a, b) => {
+            if (a.id === myUserId) return -1;
+            if (b.id === myUserId) return 1;
+            return (b.lastSeen || 0) - (a.lastSeen || 0);
+        });
+
+        countEl.textContent = activeListeners.length;
+        list.innerHTML = '';
+
+        if (activeListeners.length === 0) {
+            list.innerHTML = '<div class="listeners-empty">🔐 Ninguém deu Play ainda...</div>';
+        } else {
+            activeListeners.forEach(listener => {
+                const row = document.createElement('div');
+                row.className = 'listener-row';
+                if (listener.id === myUserId) row.classList.add('me');
+                const locationText = listener.state ? `${listener.city}, ${listener.state}` : (listener.city || '—');
+                row.innerHTML = `
+                    <div class="ip-cell">${listener.ip || '—'}${listener.id === myUserId ? ' (VOCÊ)' : ''}</div>
+                    <div class="state-cell">${locationText}</div>
+                    <div class="city-cell">${listener.country || 'BR'}</div>
+                    <div class="time-cell">${timeAgo(listener.lastSeen)}</div>
+                `;
+                list.appendChild(row);
+            });
+        }
     }
 
+    // BUSCA OUVINTES DO ICECAST via Worker Cloudflare
+    async function fetchRadioOnline() {
+        try {
+            const response = await fetch(ICECAST_PROXY_URL, { cache: 'no-cache' });
+            if (response.ok) {
+                const data = await response.json();
+                icecastListeners = data.listeners || 0;
+                updateAllDisplays();
+            }
+        } catch (err) {}
+    }
+    setInterval(fetchRadioOnline, 2000);
+    fetchRadioOnline();
+
+    // CONTADOR ACUMULADO
+    let countedThisSession = sessionStorage.getItem('esm_visit_counted');
+    function incrementTotalVisits() {
+        if (countedThisSession) return;
+        countedThisSession = '1';
+        sessionStorage.setItem('esm_visit_counted', '1');
+        counterRef.transaction((current) => {
+            if (current === null || current.count === undefined) return { count: 1, last_updated: Date.now() };
+            return { count: current.count + 1, last_updated: Date.now() };
+        }).then(r => {
+            totalAccumulated = r.snapshot.val().count;
+            updateAllDisplays();
+        }).catch(err => console.log('Erro:', err));
+    }
+    counterRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.count !== undefined) {
+            totalAccumulated = data.count;
+            updateAllDisplays();
+        }
+    });
+
+    // ============================================
+    // 🚀 INICIALIZAÇÃO
+    // ============================================
     detectarLocalizacao().then(locationData => {
         if (locationData && locationData.ip) {
             registerMyPresence(locationData);
             startHeartbeat();
-        } else {
-            log('⚠️ Não foi possível detectar IP');
         }
-        setupListenersRealtime();
     });
+
+    incrementTotalVisits();
 
     window.addEventListener('beforeunload', removeMyPresence);
     window.addEventListener('pagehide', removeMyPresence);
+
+    window.addEventListener('DOMContentLoaded', () => {
+        try{
+            const io = new IntersectionObserver(entradas=>{
+                entradas.forEach(en => { if(en.isIntersecting) en.target.classList.add('visivel') });
+            },{threshold:.12});
+            document.querySelectorAll('.aparece').forEach(el => io.observe(el));
+        }catch(e){}
+
+        setTimeout(() => {
+            audio.play()
+                .then(() => {
+                    playIcon.className = "fa-solid fa-pause";
+                    estado(true);
+                    buscando_meta();
+                })
+                .catch(err => {
+                    tocando.textContent = "Clique para ouvir";
+                });
+        }, 1000);
+    });
   </script>
 </body>
 </html>
