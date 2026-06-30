@@ -182,7 +182,7 @@
     .stats-card .header{ display:flex;align-items:center;justify-content:center;gap:6px; font-size:.78rem;text-transform:uppercase;letter-spacing:1.3px;font-weight:800;margin-bottom:8px; }
     .stats-card.site-card .header{ color:#86efac; }
     .stats-card.radio-card .header{ color:#d8b4fe; }
-    .stats-card .value{ font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;line-height:1;margin:4px 0; }
+    .stats-card .value{ font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;line-height:1;margin:4px 0; min-height:50px;display:flex;align-items:center;justify-content:center; }
     .stats-card.site-card .value{ color:#86efac;text-shadow:0 0 8px rgba(34,197,94,.3); }
     .stats-card.radio-card .value{ color:#d8b4fe;text-shadow:0 0 8px rgba(168,85,247,.3); }
     .stats-card .icon{ font-size:1.3rem; }
@@ -502,9 +502,6 @@
     const DEBUG_MODE = true;
     const log = (...a) => DEBUG_MODE && console.log('🤠', ...a);
 
-    // ============================================
-    // 🔥 FIREBASE (MESMO PROJETO DO FORRÓ QUE FUNCIONOU)
-    // ============================================
     const firebaseConfig = {
         apiKey: "AIzaSyDp5fRdPQbfn2XUmFpaArXoeE4n1-KnKA0",
         authDomain: "radio-conexao-contador.firebaseapp.com",
@@ -520,57 +517,54 @@
     const counterRef = database.ref('forro_stream/total_listeners');
     const listenersListRef = database.ref('listeners');
     
-    // 🆕 URL DO WORKER DA ESTAÇÃO SERTANEJA
+    // URL DO WORKER
     const ICECAST_PROXY_URL = 'https://wandering-hall-0361.marcostheangels.workers.dev/';
 
     // ============================================
     // 🌍 DETECTAR LOCALIZAÇÃO
     // ============================================
     async function detectarLocalizacao() {
-        const locationCard = document.getElementById('locationCardF');
-        const locationCity = document.getElementById('locationCityF');
-        const locationState = document.getElementById('locationStateF');
-        const locationFlag = document.getElementById('locationFlagF');
-        const locationIP = document.getElementById('locationIPF');
-        const locationISP = document.getElementById('locationISPF');
-        const locationStatus = document.getElementById('locationStatusF');
+        try {
+            const apis = [
+                { name: 'ipapi.co', url: 'https://ipapi.co/json/',
+                  parse: (d) => ({ city: d.city, state: d.region, country: d.country_name, countryCode: d.country_code, isp: d.org, ip: d.ip }) },
+                { name: 'ip-api.com', url: 'https://ip-api.com/json/?fields=status,country,countryCode,region,regionName,city,org,query',
+                  parse: (d) => ({ city: d.city, state: d.regionName, country: d.country, countryCode: d.countryCode, isp: d.org, ip: d.query }) }
+            ];
 
-        const apis = [
-            { name: 'ipapi.co', url: 'https://ipapi.co/json/',
-              parse: (d) => ({ city: d.city, state: d.region, country: d.country_name, countryCode: d.country_code, isp: d.org, ip: d.ip }) },
-            { name: 'ip-api.com', url: 'https://ip-api.com/json/?fields=status,country,countryCode,region,regionName,city,org,query',
-              parse: (d) => ({ city: d.city, state: d.regionName, country: d.country, countryCode: d.countryCode, isp: d.org, ip: d.query }) }
-        ];
-
-        for (const api of apis) {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-                const response = await fetch(api.url, { signal: controller.signal, cache: 'no-cache' });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                const info = api.parse(data);
-                if (info.city && info.city !== '—') {
-                    log('✅ Detectado:', info);
-                    locationCity.textContent = info.city;
-                    locationState.textContent = `${info.state || ''} • ${info.country || ''}`.trim();
-                    locationFlag.textContent = getCountryFlag(info.countryCode);
-                    locationIP.textContent = info.ip || '—';
-                    locationISP.textContent = info.isp || '—';
-                    locationCard.classList.remove('loading');
-                    locationStatus.innerHTML = `✅ Detectado`;
-                    return info;
-                }
-            } catch (err) { log(`❌ ${api.name} falhou:`, err.message); }
-        }
-
-        locationCity.textContent = 'Não detectado';
-        locationState.textContent = 'Desative AdBlock';
-        locationFlag.textContent = '❓';
-        locationIP.textContent = '—';
-        locationCard.classList.remove('loading');
-        return null;
+            for (const api of apis) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    const response = await fetch(api.url, { signal: controller.signal, cache: 'no-cache' });
+                    clearTimeout(timeoutId);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    const info = api.parse(data);
+                    if (info.city && info.city !== '—') {
+                        log('✅ IP detectado:', info);
+                        const lc = document.getElementById('locationCityF');
+                        const ls = document.getElementById('locationStateF');
+                        const lf = document.getElementById('locationFlagF');
+                        const li = document.getElementById('locationIPF');
+                        const lsp = document.getElementById('locationISPF');
+                        const lst = document.getElementById('locationStatusF');
+                        const lcard = document.getElementById('locationCardF');
+                        if (lc) lc.textContent = info.city;
+                        if (ls) ls.textContent = (info.state || '') + ' • ' + (info.country || '');
+                        if (lf) lf.textContent = getCountryFlag(info.countryCode);
+                        if (li) li.textContent = info.ip || '—';
+                        if (lsp) lsp.textContent = info.isp || '—';
+                        if (lst) lst.innerHTML = '✅ Detectado';
+                        if (lcard) lcard.classList.remove('loading');
+                        return info;
+                    }
+                } catch (err) { log(`❌ ${api.name} falhou`); }
+            }
+            const lst = document.getElementById('locationStatusF');
+            if (lst) lst.innerHTML = '⚠️ Não detectado';
+            return null;
+        } catch (err) { log('❌ Erro localização:', err); return null; }
     }
 
     function getCountryFlag(countryCode) {
@@ -579,7 +573,7 @@
     }
 
     // ============================================
-    // 🎵 RÁDIO PLAYER (código original)
+    // 🎵 RÁDIO PLAYER
     // ============================================
     const FONTES = [
       'https://stream.estacaosertanejamontesclaros.shop/sertaneja',
@@ -660,15 +654,15 @@
     setInterval(buscarMeta,12000);
 
     // ============================================
-    // 🆕 SISTEMA DE OUINTES - MESMA LÓGICA DO FORRÓ
+    // 🆕 SISTEMA DE OUINTES - CORRIGIDO
     // ============================================
     const myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     let myUserRef = null;
     let heartbeatInterval = null;
     let myLocationData = null;
     let totalAccumulated = 0;
-    let icecastListeners = 0; // TOTAL do Icecast
-    let siteOnlineCount = 0;  // Pessoas no site (Firebase)
+    let icecastListeners = 0;
+    let siteOnlineCount = 0;
 
     function timeAgo(timestamp) {
         const diff = Date.now() - timestamp;
@@ -718,99 +712,117 @@
         if (heartbeatInterval) clearInterval(heartbeatInterval);
     }
 
-    // 🆕 FUNÇÃO INTELIGENTE - MESMA LÓGICA DO FORRÓ
-    function updateAllDisplays() {
-        const siteOnly = siteOnlineCount;
-        const icecastTotal = icecastListeners;
-        // MESMA LÓGICA: Icecast - Site = quem está SÓ no radio
-        const radioOnly = Math.max(0, icecastTotal - siteOnly);
-        const totalOnline = Math.max(icecastTotal, siteOnly);
-        
-        document.getElementById('statSiteCount').textContent = siteOnly;
-        document.getElementById('statRadioCount').textContent = radioOnly;
-        document.getElementById('floatingCount').textContent = totalOnline;
-        document.getElementById('totalOnlineDisplay').textContent = totalOnline;
-        document.getElementById('listenerCount').textContent = totalOnline;
-        document.getElementById('totalVisitsAccumulated').textContent = totalAccumulated.toLocaleString('pt-BR');
+    function updateDisplays() {
+        try {
+            const siteEl = document.getElementById('statSiteCount');
+            const radioEl = document.getElementById('statRadioCount');
+            const totalEl = document.getElementById('statTotalCount');
+            const onlineEl = document.getElementById('totalOnlineDisplay');
+            const listenerEl = document.getElementById('listenerCount');
+            const visitsEl = document.getElementById('totalVisitsAccumulated');
+            const siteBar = document.getElementById('barSite');
+            const radioBar = document.getElementById('barRadio');
+            
+            const siteOnly = siteOnlineCount;
+            const icecastTotal = icecastListeners;
+            const radioOnly = Math.max(0, icecastTotal - siteOnly);
+            const totalOnline = Math.max(icecastTotal, siteOnly);
+            
+            if (siteEl) siteEl.textContent = siteOnly;
+            if (radioEl) radioEl.textContent = radioOnly;
+            if (totalEl) totalEl.textContent = totalOnline;
+            if (onlineEl) onlineEl.textContent = totalOnline;
+            if (listenerEl) listenerEl.textContent = totalOnline;
+            if (visitsEl) visitsEl.textContent = totalAccumulated.toLocaleString('pt-BR');
+            
+            const maxVal = Math.max(totalOnline, 1);
+            if (siteBar) siteBar.style.width = (siteOnly / maxVal * 100) + '%';
+            if (radioBar) radioBar.style.width = (radioOnly / maxVal * 100) + '%';
+        } catch (err) { log('❌ Erro update:', err); }
     }
 
-    // CONTADOR DO SITE (Firebase) - MESMO DO FORRÓ
+    // CONTADOR DO SITE
     listenersListRef.on('value', (snapshot) => {
-        const data = snapshot.val() || {};
-        const now = Date.now();
-        const ACTIVE_LIMIT = 5 * 60 * 1000; // 5 min
-        let count = 0;
-        Object.values(data).forEach(listener => {
-            if (now - (listener.lastSeen || 0) < ACTIVE_LIMIT && listener.ip) count++;
-        });
-        siteOnlineCount = count;
-        updateAllDisplays();
-        displayIPsList(snapshot);
+        try {
+            const data = snapshot.val() || {};
+            const now = Date.now();
+            const ACTIVE_LIMIT = 5 * 60 * 1000;
+            let count = 0;
+            Object.values(data).forEach(listener => {
+                if (now - (listener.lastSeen || 0) < ACTIVE_LIMIT && listener.ip) count++;
+            });
+            siteOnlineCount = count;
+            updateDisplays();
+            displayIPsList(snapshot);
+        } catch (err) { log('❌ Firebase:', err); }
     });
 
     function displayIPsList(snapshot) {
-        const list = document.getElementById('listenersListF');
-        const countEl = document.getElementById('listenersCountF');
-        if (!list || !countEl) return;
-        
-        const data = snapshot.val() || {};
-        const now = Date.now();
-        const ACTIVE_LIMIT = 5 * 60 * 1000;
-        const activeListeners = [];
-        const cleanupPromises = [];
+        try {
+            const list = document.getElementById('listenersListF');
+            const countEl = document.getElementById('listenersCountF');
+            if (!list || !countEl) return;
+            
+            const data = snapshot.val() || {};
+            const now = Date.now();
+            const ACTIVE_LIMIT = 5 * 60 * 1000;
+            const activeListeners = [];
+            const cleanupPromises = [];
 
-        Object.entries(data).forEach(([id, listener]) => {
-            const lastSeen = listener.lastSeen || 0;
-            if (now - lastSeen < ACTIVE_LIMIT && listener.ip) {
-                activeListeners.push({ id, ...listener });
-            } else if (now - lastSeen > 24 * 60 * 60 * 1000) {
-                cleanupPromises.push(listenersListRef.child(id).remove().catch(() => {}));
-            }
-        });
-
-        activeListeners.sort((a, b) => {
-            if (a.id === myUserId) return -1;
-            if (b.id === myUserId) return 1;
-            return (b.lastSeen || 0) - (a.lastSeen || 0);
-        });
-
-        countEl.textContent = activeListeners.length;
-        list.innerHTML = '';
-
-        if (activeListeners.length === 0) {
-            list.innerHTML = '<div class="listeners-empty-forr">🔐 Ninguém deu Play ainda...</div>';
-        } else {
-            activeListeners.forEach(listener => {
-                const row = document.createElement('div');
-                row.className = 'listener-row-forr';
-                if (listener.id === myUserId) row.classList.add('me');
-                const locationText = listener.state ? `${listener.city}, ${listener.state}` : (listener.city || '—');
-                row.innerHTML = `
-                    <div class="ip-cell">${listener.ip || '—'}${listener.id === myUserId ? ' (VOCÊ)' : ''}</div>
-                    <div class="state-cell">${locationText}</div>
-                    <div class="city-cell">${listener.country || 'BR'}</div>
-                    <div class="time-cell">${timeAgo(listener.lastSeen)}</div>
-                `;
-                list.appendChild(row);
+            Object.entries(data).forEach(([id, listener]) => {
+                const lastSeen = listener.lastSeen || 0;
+                if (now - lastSeen < ACTIVE_LIMIT && listener.ip) {
+                    activeListeners.push({ id, ...listener });
+                } else if (now - lastSeen > 24 * 60 * 60 * 1000) {
+                    cleanupPromises.push(listenersListRef.child(id).remove().catch(() => {}));
+                }
             });
-        }
+
+            activeListeners.sort((a, b) => {
+                if (a.id === myUserId) return -1;
+                if (b.id === myUserId) return 1;
+                return (b.lastSeen || 0) - (a.lastSeen || 0);
+            });
+
+            countEl.textContent = activeListeners.length;
+            list.innerHTML = '';
+
+            if (activeListeners.length === 0) {
+                list.innerHTML = '<div class="listeners-empty-forr">🔐 Ninguém deu Play ainda...</div>';
+            } else {
+                activeListeners.forEach(listener => {
+                    const row = document.createElement('div');
+                    row.className = 'listener-row-forr';
+                    if (listener.id === myUserId) row.classList.add('me');
+                    const locationText = listener.state ? `${listener.city}, ${listener.state}` : (listener.city || '—');
+                    row.innerHTML = `
+                        <div class="ip-cell">${listener.ip || '—'}${listener.id === myUserId ? ' (VOCÊ)' : ''}</div>
+                        <div class="state-cell">${locationText}</div>
+                        <div class="city-cell">${listener.country || 'BR'}</div>
+                        <div class="time-cell">${timeAgo(listener.lastSeen)}</div>
+                    `;
+                    list.appendChild(row);
+                });
+            }
+        } catch (err) { log('❌ displayIPsList:', err); }
     }
 
-    // BUSCA OUVINTES DO ICECAST (atualiza a cada 2s) - MESMO DO FORRÓ
+    // BUSCA OUVINTES DO ICECAST
     async function fetchRadioOnline() {
         try {
             const response = await fetch(ICECAST_PROXY_URL, { cache: 'no-cache' });
             if (response.ok) {
                 const data = await response.json();
                 icecastListeners = data.listeners || 0;
-                updateAllDisplays();
+                log('📡 Icecast:', icecastListeners, 'ouvintes');
+                updateDisplays();
             }
-        } catch (err) {}
+        } catch (err) { log('❌ Erro Worker:', err); }
     }
     setInterval(fetchRadioOnline, 2000);
     fetchRadioOnline();
 
-    // CONTADOR ACUMULADO - MESMO DO FORRÓ
+    // CONTADOR ACUMULADO
     let countedThisSession = sessionStorage.getItem('esm_visit_counted');
     function incrementTotalVisits() {
         if (countedThisSession) return;
@@ -821,55 +833,58 @@
             return { count: current.count + 1, last_updated: Date.now() };
         }).then(r => {
             totalAccumulated = r.snapshot.val().count;
-            updateAllDisplays();
-        }).catch(err => console.log('Erro:', err));
+            updateDisplays();
+        }).catch(err => log('Erro:', err));
     }
     counterRef.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data && data.count !== undefined) {
             totalAccumulated = data.count;
-            updateAllDisplays();
+            updateDisplays();
         }
     });
 
     // ============================================
-    // 🚀 INICIALIZAÇÃO - IGUAL AO FORRÓ
+    // 🚀 INICIALIZAÇÃO
     // ============================================
-    detectarLocalizacao().then(locationData => {
-        if (locationData && locationData.ip) {
-            registerMyPresence(locationData);
-            startHeartbeat();
-        }
-    });
+    function init() {
+        try {
+            detectarLocalizacao().then(locationData => {
+                if (locationData && locationData.ip) {
+                    registerMyPresence(locationData);
+                    startHeartbeat();
+                }
+            });
+            incrementTotalVisits();
+        } catch (err) { log('❌ Init:', err); }
+    }
 
-    incrementTotalVisits();
+    // Garante que DOM está pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
     window.addEventListener('beforeunload', removeMyPresence);
     window.addEventListener('pagehide', removeMyPresence);
 
-    window.addEventListener('DOMContentLoaded', () => {
-        updateClock();
-        setInterval(updateClock, 1000);
-        fetchNowPlaying();
-        setInterval(fetchNowPlaying, 2000);
-        
-        // Autoplay
-        setTimeout(() => {
-            audio.play()
-                .then(() => {
-                    playIcon.className = "fa-solid fa-pause";
-                    playBtnRing.classList.remove('opacity-0');
-                    statusText.innerText = "No Ar - Forró Stream MOC";
-                    statusText.className = "text-xl font-semibold text-green-400";
-                    waveform.classList.remove('hidden');
-                    updateLastSeen();
-                })
-                .catch(err => {
-                    statusText.innerText = "Clique para ouvir MOC";
-                    statusText.className = "text-xl font-semibold text-amber-400";
-                });
-        }, 1000);
+    window.addEventListener('load', () => {
+        try {
+            updateClock();
+            setInterval(updateClock, 1000);
+            fetchNowPlaying();
+            setInterval(fetchNowPlaying, 2000);
+        } catch (err) { log('❌ Load:', err); }
     });
+
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const el = document.getElementById('currentTime');
+        if (el) el.textContent = `${hours}:${minutes}`;
+    }
 
     function createJuninaEffects() {
         const playBtn = document.getElementById('playBtn');
