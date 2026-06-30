@@ -158,7 +158,7 @@
     .aviso-erro.visivel{display:block}
     .btn-tentar{background:transparent;border:1px solid var(--ouro);color:var(--ouro);padding:4px 10px;border-radius:999px;cursor:pointer;margin-left:8px}
 
-    /* ============== CARD DE LOCALIZAÇÃO COM IP ============== */
+    /* CARD DE LOCALIZAÇÃO */
     .location-card{
       max-width:620px;margin:24px auto 0;
       padding:20px;border-radius:20px;text-align:left;
@@ -193,7 +193,7 @@
     .location-status{margin-top:12px;font-size:.78rem;text-align:center;color:rgba(248,241,224,.6);font-style:italic}
     .location-status.listening{color:#22c55e;font-weight:800;font-style:normal}
 
-    /* 🆕 DOIS CARDS: SITE e RADIOSNET (IGUAL AO FORRÓ) */
+    /* 🆕 DOIS CARDS: SITE e RADIOSNET */
     .stats-grid{ display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px auto 0;max-width:620px; }
     .stats-card{ padding:18px;border-radius:18px; text-align:center;backdrop-filter:blur(8px); position:relative;overflow:hidden; }
     .stats-card.site-card{ background:linear-gradient(135deg,rgba(34,197,94,.10),rgba(34,197,94,.05)); border:1px solid rgba(34,197,94,.4); }
@@ -209,7 +209,7 @@
     .stats-card .live-indicator{ display:inline-block;width:6px;height:6px;background:#22c55e;border-radius:50%; margin-right:4px;animation:pulseVivo 1.2s infinite; }
     .stats-card.radio-card .live-indicator{ background:#a855f7; }
 
-    /* ============== CARD DE OUINTES COM IPs ============== */
+    /* CARD DE OUINTES COM IPs */
     .listeners-card{
       max-width:620px;margin:18px auto 0;
       padding:20px;border-radius:20px;text-align:left;
@@ -368,7 +368,7 @@
           <div class="aviso-erro" id="erroBox">⚠️ <span id="erroTxt">Não foi possível conectar</span><button class="btn-tentar" id="btnTentar">Tentar novamente</button></div>
         </div>
 
-        <!-- ============== CARD DE LOCALIZAÇÃO ============== -->
+        <!-- CARD DE LOCALIZAÇÃO -->
         <div class="location-card loading" id="locationCard">
           <div class="location-header">
             <span class="pulse-dot"></span>
@@ -401,26 +401,26 @@
           <div class="stats-card site-card">
             <div class="header">
               <span class="live-indicator"></span>
-              <span><i class="fa-solid fa-globe icon"></i> NO SITE</span>
+              <span>🌐 NO SITE</span>
             </div>
             <div class="value" id="statSiteCount">0</div>
             <div class="footer">
-              <i class="fa-solid fa-play" style="color:#22c55e"></i> Quem deu Play aqui
+              ▶ Quem deu Play aqui
             </div>
           </div>
           <div class="stats-card radio-card">
             <div class="header">
               <span class="live-indicator"></span>
-              <span><i class="fa-solid fa-satellite-dish icon"></i> NO RADIOSNET</span>
+              <span>📻 NO RADIOSNET</span>
             </div>
             <div class="value" id="statRadioCount">0</div>
             <div class="footer">
-              <i class="fa-solid fa-signal" style="color:#a855f7"></i> Ouvindo via Icecast
+              📡 Ouvindo via Icecast
             </div>
           </div>
         </div>
 
-        <!-- ============== CARD DE OUINTES COM IPs ============== -->
+        <!-- CARD DE OUINTES COM IPs -->
         <div class="listeners-card" id="listenersCard">
           <div class="listeners-header">
             <div class="listeners-title">
@@ -497,18 +497,16 @@
     <source src="https://stream.estacaosertanejamontesclaros.shop/sertaneja" type="audio/mpeg">
   </audio>
 
-  <!-- 🔥 FIREBASE + WORKER COMPAT -->
+  <!-- 🔥 FIREBASE COMPAT (igual ao Forró que funcionou) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-  <script src="https://kit.fontawesome.com/2c8e8e8e8e.js" crossorigin="anonymous"></script>
 
   <script>
     const DEBUG_MODE = true;
     const log = (...a) => DEBUG_MODE && console.log('🤠', ...a);
 
     // ============================================
-    // 🔥 CONFIGURAÇÃO FIREBASE - RÁDIO ESTAÇÃO SERTANEJA
-    // 👉 USA O MESMO PROJETO "radio-conexao-contador" PARA COMPARTILHAR DADOS
+    // 🔥 CONFIGURAÇÃO FIREBASE (MESMO PROJETO DO FORRÓ)
     // ============================================
     const firebaseConfig = {
         apiKey: "AIzaSyDp5fRdPQbfn2XUmFpaArXoeE4n1-KnKA0",
@@ -525,10 +523,8 @@
     const counterRef = database.ref('forro_stream/total_listeners');
     const listenersListRef = database.ref('listeners');
     
-    // 🆕 URL do Worker Cloudflare - SUBSTITUA PELA SUA!
-    // Crie um worker em https://dash.cloudflare.com/ seguindo o tutorial que te passei
-    // O Worker conta os ouvintes do seu Icecast (stream.estacaosertanejamontesclaros.shop)
-    const ICECAST_PROXY_URL = 'https://flat-rain-59ad.marcostheangels.workers.dev/';
+    // 🆕 URL DO SEU WORKER (Estação Sertaneja) - CONFIRMADO FUNCIONANDO!
+    const ICECAST_PROXY_URL = 'https://wandering-hall-0361.marcostheangels.workers.dev/';
 
     // ============================================
     // 🌍 DETECTAR LOCALIZAÇÃO
@@ -586,7 +582,7 @@
     }
 
     // ============================================
-    // 🎵 RÁDIO PLAYER (mantido 100% do original)
+    // 🎵 RÁDIO PLAYER (código original mantido)
     // ============================================
     const FONTES = [
       'https://stream.estacaosertanejamontesclaros.shop/sertaneja',
@@ -667,7 +663,7 @@
     setInterval(buscarMeta,12000);
 
     // ============================================
-    // 🆕 SISTEMA DE OUINTES - LÓGICA IGUAL AO FORRÓ
+    // 🆕 SISTEMA DE OUINTES - LÓGICA "ICECAST - SITE"
     // ============================================
     const myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     let myUserRef = null;
@@ -734,13 +730,10 @@
         
         document.getElementById('statSiteCount').textContent = siteOnly;
         document.getElementById('statRadioCount').textContent = radioOnly;
-        document.getElementById('floatingCount') && (document.getElementById('floatingCount').textContent = totalOnline);
-        document.getElementById('totalOnlineDisplay') && (document.getElementById('totalOnlineDisplay').textContent = totalOnline);
-        document.getElementById('listenerCount') && (document.getElementById('listenerCount').textContent = totalOnline);
         document.getElementById('totalVisitsAccumulated') && (document.getElementById('totalVisitsAccumulated').textContent = totalAccumulated.toLocaleString('pt-BR'));
     }
 
-    // CONTADOR DO SITE: pessoas que deram play (lastSeen < 5 min)
+    // CONTADOR DO SITE
     listenersListRef.on('value', (snapshot) => {
         const data = snapshot.val() || {};
         const now = Date.now();
@@ -802,7 +795,7 @@
         }
     }
 
-    // BUSCA OUVINTES DO ICECAST via Worker Cloudflare
+    // BUSCA OUVINTES DO ICECAST (atualiza a cada 2s)
     async function fetchRadioOnline() {
         try {
             const response = await fetch(ICECAST_PROXY_URL, { cache: 'no-cache' });
@@ -861,6 +854,7 @@
             document.querySelectorAll('.aparece').forEach(el => io.observe(el));
         }catch(e){}
 
+        // Autoplay
         setTimeout(() => {
             audio.play()
                 .then(() => {
