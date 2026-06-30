@@ -213,11 +213,28 @@
     .listeners-empty-forr{ padding:26px 18px;text-align:center;color:rgba(203,213,225,.5); font-style:italic;font-size:.88rem; }
     .listeners-status-forr{margin-top:9px;font-size:.7rem;text-align:center;color:rgba(203,213,225,.4);font-style:italic}
 
+    /* 🆕 BLOCO ESPECIAL: TOTAL DE VISITAS + ONLINE */
+    .visit-summary{ max-width:600px;margin:18px auto 0;padding:20px;border-radius:20px; background:linear-gradient(135deg, rgba(99,102,241,.10), rgba(168,85,247,.08), rgba(34,197,94,.10)); border:1px solid rgba(99,102,241,.4); backdrop-filter:blur(8px); }
+    .visit-summary-title{ display:flex;align-items:center;justify-content:center;gap:8px; font-size:.95rem;color:#a5b4fc;text-transform:uppercase;letter-spacing:1.5px;font-weight:800;margin-bottom:16px; }
+    .visit-summary-grid{ display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+    .visit-summary-box{ background:rgba(0,0,0,.4);padding:16px 12px;border-radius:14px; text-align:center;border:1px solid rgba(255,255,255,.08); }
+    .visit-summary-box.online{ border-color:rgba(34,197,94,.5);background:linear-gradient(135deg, rgba(34,197,94,.15), rgba(0,0,0,.4)); }
+    .visit-summary-box.visits{ border-color:rgba(99,102,241,.5);background:linear-gradient(135deg, rgba(99,102,241,.15), rgba(0,0,0,.4)); }
+    .visit-summary-box .label{ font-size:.7rem;color:rgba(255,255,255,.65);text-transform:uppercase; letter-spacing:1px;font-weight:700;margin-bottom:6px; }
+    .visit-summary-box .value{ font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;line-height:1; }
+    .visit-summary-box.online .value{ color:#86efac;text-shadow:0 0 8px rgba(34,197,94,.3); }
+    .visit-summary-box.visits .value{ color:#a5b4fc;text-shadow:0 0 8px rgba(99,102,241,.3); }
+    .visit-summary-box .icon{ font-size:1.4rem;display:block;margin-bottom:4px; }
+    .visit-summary-box.online .icon{ color:#22c55e; }
+    .visit-summary-box.visits .icon{ color:#818cf8; }
+    .visit-summary-box .live-indicator{ display:inline-block;width:6px;height:6px;background:#22c55e;border-radius:50%; margin-right:4px;animation:pulseVivo 1.2s infinite; }
+
     @media (max-width:640px){
       .location-details-forr{grid-template-columns:1fr}
       .listeners-table-header-forr,.listener-row-forr{grid-template-columns:1fr 1fr 50px;font-size:.7rem}
       .listeners-table-header-forr .col-state,.listener-row-forr .state-cell{display:none}
       .stats-grid{grid-template-columns:1fr;gap:10px}
+      .visit-summary-grid{grid-template-columns:1fr;gap:10px}
     }
 
     .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:50px 0}
@@ -363,6 +380,26 @@
           </div>
         </div>
 
+        <!-- 🆕 BLOCO ESPECIAL: ONLINE + VISITAS (DESTACADO) -->
+        <div class="visit-summary" id="visitSummary">
+          <div class="visit-summary-title">
+            📊 ESTATÍSTICAS DO SITE
+          </div>
+          <div class="visit-summary-grid">
+            <div class="visit-summary-box online">
+              <span class="icon">🟢</span>
+              <span class="live-indicator"></span>
+              <div class="label">Online Agora</div>
+              <div class="value" id="totalOnlineDisplay">0</div>
+            </div>
+            <div class="visit-summary-box visits">
+              <span class="icon">👁️</span>
+              <div class="label">Total de Visitas</div>
+              <div class="value" id="totalVisitsAccumulated">0</div>
+            </div>
+          </div>
+        </div>
+
         <div class="listeners-card-forr" id="listenersCardF">
           <div class="listeners-header-forr">
             <div class="listeners-title-forr">
@@ -411,20 +448,6 @@
                 <p class="text-sm text-slate-300">Clique aqui e envie seu pedido pelo WhatsApp</p>
               </div>
               <i class="fa-solid fa-arrow-right text-2xl text-green-400 group-hover:translate-x-2 transition-transform"></i>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/40 rounded-xl text-center">
-              <i class="fa-solid fa-signal text-2xl text-green-400 mb-2 animate-pulse"></i>
-              <p class="text-xs text-slate-400 mb-1">Online Total</p>
-              <p class="text-2xl font-black text-green-400" id="totalOnlineDisplay">0</p>
-              <p class="text-[10px] text-green-400/80 mt-1">em tempo real</p>
-            </div>
-            <div class="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl text-center">
-              <i class="fa-solid fa-database text-2xl text-blue-400 mb-2"></i>
-              <p class="text-xs text-slate-400 mb-1">Total de Visitas</p>
-              <p class="text-2xl font-black text-blue-400" id="totalVisitsAccumulated">0</p>
-              <p class="text-[10px] text-blue-400/80 mt-1">acumulado</p>
             </div>
           </div>
           <div class="p-5 bg-slate-900/60 border border-slate-700 rounded-xl space-y-4">
@@ -516,8 +539,6 @@
     const database = firebase.database();
     const counterRef = database.ref('forro_stream/total_listeners');
     const listenersListRef = database.ref('listeners');
-    
-    // URL DO WORKER
     const ICECAST_PROXY_URL = 'https://wandering-hall-0361.marcostheangels.workers.dev/';
 
     // ============================================
@@ -654,7 +675,7 @@
     setInterval(buscarMeta,12000);
 
     // ============================================
-    // 🆕 SISTEMA DE OUINTES - CORRIGIDO
+    // 🆕 SISTEMA DE OUINTES - COM OS 2 CARDS
     // ============================================
     const myUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     let myUserRef = null;
@@ -682,20 +703,14 @@
 
     async function registerMyPresence(locationData) {
         if (!locationData || !locationData.ip) return;
-        
         myUserRef = listenersListRef.child(myUserId);
         myLocationData = locationData;
         const locationText = locationData.state ? `${locationData.city}, ${locationData.state}` : locationData.city;
-        
         try {
             await myUserRef.set({
-                ip: locationData.ip,
-                city: locationData.city,
-                state: locationData.state || '',
-                country: locationData.country || 'BR',
-                isp: locationData.isp || '',
-                location: locationText,
-                lastSeen: firebase.database.ServerValue.TIMESTAMP
+                ip: locationData.ip, city: locationData.city, state: locationData.state || '',
+                country: locationData.country || 'BR', isp: locationData.isp || '',
+                location: locationText, lastSeen: firebase.database.ServerValue.TIMESTAMP
             });
             log('✅ SALVO:', myUserId);
         } catch (err) { log('❌ ERRO:', err); }
@@ -716,12 +731,8 @@
         try {
             const siteEl = document.getElementById('statSiteCount');
             const radioEl = document.getElementById('statRadioCount');
-            const totalEl = document.getElementById('statTotalCount');
             const onlineEl = document.getElementById('totalOnlineDisplay');
-            const listenerEl = document.getElementById('listenerCount');
             const visitsEl = document.getElementById('totalVisitsAccumulated');
-            const siteBar = document.getElementById('barSite');
-            const radioBar = document.getElementById('barRadio');
             
             const siteOnly = siteOnlineCount;
             const icecastTotal = icecastListeners;
@@ -730,15 +741,11 @@
             
             if (siteEl) siteEl.textContent = siteOnly;
             if (radioEl) radioEl.textContent = radioOnly;
-            if (totalEl) totalEl.textContent = totalOnline;
             if (onlineEl) onlineEl.textContent = totalOnline;
-            if (listenerEl) listenerEl.textContent = totalOnline;
             if (visitsEl) visitsEl.textContent = totalAccumulated.toLocaleString('pt-BR');
             
-            const maxVal = Math.max(totalOnline, 1);
-            if (siteBar) siteBar.style.width = (siteOnly / maxVal * 100) + '%';
-            if (radioBar) radioBar.style.width = (radioOnly / maxVal * 100) + '%';
-        } catch (err) { log('❌ Erro update:', err); }
+            log(`📊 Site:${siteOnly} | Radio:${radioOnly} | Total Online:${totalOnline} | Visitas Acumuladas:${totalAccumulated}`);
+        } catch (err) { log('❌ update:', err); }
     }
 
     // CONTADOR DO SITE
@@ -814,15 +821,14 @@
             if (response.ok) {
                 const data = await response.json();
                 icecastListeners = data.listeners || 0;
-                log('📡 Icecast:', icecastListeners, 'ouvintes');
                 updateDisplays();
             }
-        } catch (err) { log('❌ Erro Worker:', err); }
+        } catch (err) { log('❌ Worker:', err); }
     }
     setInterval(fetchRadioOnline, 2000);
     fetchRadioOnline();
 
-    // CONTADOR ACUMULADO
+    // CONTADOR ACUMULADO DE VISITAS
     let countedThisSession = sessionStorage.getItem('esm_visit_counted');
     function incrementTotalVisits() {
         if (countedThisSession) return;
@@ -833,6 +839,7 @@
             return { count: current.count + 1, last_updated: Date.now() };
         }).then(r => {
             totalAccumulated = r.snapshot.val().count;
+            log(`👁️ Total de visitas (acumulado): ${totalAccumulated}`);
             updateDisplays();
         }).catch(err => log('Erro:', err));
     }
@@ -859,7 +866,6 @@
         } catch (err) { log('❌ Init:', err); }
     }
 
-    // Garante que DOM está pronto
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
